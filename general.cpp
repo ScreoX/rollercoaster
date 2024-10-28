@@ -1,8 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <cmath>
-#include <string>
 #include "algorithm"
 
 float findAvg(std::vector<float> numbers) {

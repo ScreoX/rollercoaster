@@ -1,8 +1,5 @@
 #include <gtest/gtest.h>
-#include <vector>
 #include <fstream>
-#include <string>
-#include <utility>
 
 std::vector<float> readBinaryFile(const std::string& filename);
 float findAvg(std::vector<float> numbers);
