@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <vector>
 #include <fstream>
 
 std::vector<float> readBinaryFile(const std::string& filename);
@@ -40,8 +41,8 @@ TEST(RollercoasterDetectionTest, DetectRollercoasters) {
     ASSERT_EQ(results.size(), expectedResults.size());
 
     for (size_t i = 0; i < expectedResults.size(); ++i) {
-        EXPECT_EQ(results[i].first, expectedResults[i].first);
-        EXPECT_EQ(results[i].second, expectedResults[i].second);
+        ASSERT_EQ(results[i].first, expectedResults[i].first);
+        ASSERT_EQ(results[i].second, expectedResults[i].second);
     }
 }
 
