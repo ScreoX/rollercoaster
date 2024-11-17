@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
 #include <vector>
 #include <fstream>
+#include <stdexcept>
 
 std::vector<float> readBinaryFile(const std::string& filename);
 float findAvg(std::vector<float> numbers);
-float findFloor(std::vector<float>& numbers, float avg);
+float findFloor(const std::vector<float>& numbers, float avg);
+std::vector<float> smoothData(const std::vector<float>& data, float alpha);
 std::vector<std::pair<int, int>> detectRollercoasters(const std::vector<float>& data, int minWidth, int maxWidth, float noiseLevel);
 
 const int MIN_WIDTH = 3;
@@ -23,7 +25,7 @@ std::vector<std::pair<int, int>> readExpectedResults(const std::string& filename
         }
         file.close();
     } else {
-        throw std::runtime_error("Failed to open expected results file.");
+        throw std::runtime_error("Failed to open expected results file: " + filename);
     }
 
     return expectedResults;
@@ -31,18 +33,23 @@ std::vector<std::pair<int, int>> readExpectedResults(const std::string& filename
 
 TEST(RollercoasterDetectionTest, DetectRollercoasters) {
     std::vector<float> data = readBinaryFile(INPUT_FILE);
-    std::vector<std::pair<int, int>> expectedResults = readExpectedResults(EXPECTED_OUTPUT_FILE);
+    ASSERT_FALSE(data.empty()) << "Data should not be empty after reading the binary file.";
+
+    data = smoothData(data, 0.3f);
+    ASSERT_FALSE(data.empty()) << "Smoothed data should not be empty.";
 
     float avg = findAvg(data);
     float floor = findFloor(data, avg);
 
     std::vector<std::pair<int, int>> results = detectRollercoasters(data, MIN_WIDTH, MAX_WIDTH, floor);
 
-    ASSERT_EQ(results.size(), expectedResults.size());
+    std::vector<std::pair<int, int>> expectedResults = readExpectedResults(EXPECTED_OUTPUT_FILE);
+
+    ASSERT_EQ(results.size(), expectedResults.size()) << "Number of detected rollercoasters does not match expected.";
 
     for (size_t i = 0; i < expectedResults.size(); ++i) {
-        ASSERT_EQ(results[i].first, expectedResults[i].first);
-        ASSERT_EQ(results[i].second, expectedResults[i].second);
+        ASSERT_EQ(results[i].first, expectedResults[i].first) << "Mismatch in start index at rollercoaster " << i;
+        ASSERT_EQ(results[i].second, expectedResults[i].second) << "Mismatch in end index at rollercoaster " << i;
     }
 }
 
